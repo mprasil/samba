@@ -93,18 +93,18 @@ EOF
   ##
   # USER ACCOUNTS
   ##
-  while read -r I_ACCOUNT; do
+  echo "$(env | grep '^ACCOUNT_')" | while IFS= read -r I_ACCOUNT ; do
     ACCOUNT_NAME=$(echo "$I_ACCOUNT" | cut -d'=' -f1 | sed 's/ACCOUNT_//g' | tr '[:upper:]' '[:lower:]')
     ACCOUNT_PASSWORD=$(echo "$I_ACCOUNT" | sed 's/^[^=]*=//g')
 
     echo ">> ACCOUNT: adding account: $ACCOUNT_NAME"
     useradd -M -s /bin/false "$ACCOUNT_NAME"
-    echo "$ACCOUNT_PASSWORD\n$ACCOUNT_PASSWORD" | passwd "$ACCOUNT_NAME"
-    echo "$ACCOUNT_PASSWORD\n$ACCOUNT_PASSWORD" | smbpasswd -a "$ACCOUNT_NAME"
+    echo -e "$ACCOUNT_PASSWORD\n$ACCOUNT_PASSWORD" | passwd "$ACCOUNT_NAME"
+    echo -e "$ACCOUNT_PASSWORD\n$ACCOUNT_PASSWORD" | smbpasswd -a "$ACCOUNT_NAME"
     smbpasswd -e "$ACCOUNT_NAME"
 
     unset $(echo "$I_ACCOUNT" | cut -d'=' -f1)
-  done <<< "$(env | grep '^ACCOUNT_')"
+  done
 
   ##
   # Samba Vonlume Config ENVs
@@ -117,6 +117,7 @@ EOF
     echo "" >> /etc/smb.conf
   done
 
+  #cp /etc/smb.conf /etc/samba/smb.conf
   touch "$INITALIZED"
 else
   echo ">> CONTAINER: already initialized - direct start of samba"
