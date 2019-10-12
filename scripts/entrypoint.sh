@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 cat <<EOF
 ################################################################################
@@ -98,7 +98,7 @@ EOF
     ACCOUNT_PASSWORD=$(echo "$I_ACCOUNT" | sed 's/^[^=]*=//g')
 
     echo ">> ACCOUNT: adding account: $ACCOUNT_NAME"
-    useradd -M -s /bin/false "$ACCOUNT_NAME"
+    adduser -H -s /bin/false "$ACCOUNT_NAME"
     echo -e "$ACCOUNT_PASSWORD\n$ACCOUNT_PASSWORD" | passwd "$ACCOUNT_NAME"
     echo -e "$ACCOUNT_PASSWORD\n$ACCOUNT_PASSWORD" | smbpasswd -a "$ACCOUNT_NAME"
     smbpasswd -e "$ACCOUNT_NAME"
@@ -117,7 +117,7 @@ EOF
     echo "" >> /etc/smb.conf
   done
 
-  #cp /etc/smb.conf /etc/samba/smb.conf
+  cp /etc/smb.conf /etc/samba/smb.conf
   touch "$INITALIZED"
 else
   echo ">> CONTAINER: already initialized - direct start of samba"
