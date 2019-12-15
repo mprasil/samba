@@ -37,17 +37,12 @@ if [ ! -f "$INITALIZED" ]; then
   ##
 cat > /etc/smb.conf <<EOF
 [global]
-   server role = standalone server
-
-   workgroup = $SAMBA_CONF_WORKGROUP
-   server string = $SAMBA_CONF_SERVER_STRING
-
-   map to guest = $SAMBA_CONF_MAP_TO_GUEST
-
-   dns proxy = no
-
-   log file = /dev/stdout
-
+ server role = standalone server
+ workgroup = $SAMBA_CONF_WORKGROUP
+ server string = $SAMBA_CONF_SERVER_STRING
+ map to guest = $SAMBA_CONF_MAP_TO_GUEST
+ dns proxy = no
+ log file = /dev/stdout
 EOF
 
   ##
@@ -57,10 +52,22 @@ EOF
   then
     echo ">> SAMBA CONFIG: enabling Apple's SMB2+ extentions"
 cat >> /etc/smb.conf <<EOF
-   vfs objects = catia fruit streams_xattr
-   fruit:aapl = yes
-   fruit:nfs_aces = no
+ vfs objects = catia fruit streams_xattr
+ fruit:aapl = yes
 EOF
+  fi
+
+  ##
+  # Global configuration
+  ##
+  if env | grep 'SAMBA_GLOBAL_CONFIG_' 2> /dev/null >/dev/null
+  then
+    echo "Global configuration environmental variables found. Adding them now."
+  for G_CONF in "$(env | grep '^SAMBA_GLOBAL_CONFIG_')"
+  do
+    GCONF_CONF_VALUE=$(echo "$G_CONF" | sed 's/^[^=]*=//g')
+    echo "$GCONF_CONF_VALUE" | sed 's/;/\n/g' >> /etc/smb.conf
+  done
   fi
 
   ##
@@ -70,7 +77,7 @@ EOF
   then
     echo ">> SAMBA CONFIG: \$SAMBA_CONF_ENABLE_NTLM_AUTH is set, enabling ntlm auth"
 cat >> /etc/smb.conf <<EOF
-   ntlm auth = yes
+ ntlm auth = yes
 
 EOF
   fi
@@ -107,7 +114,7 @@ EOF
   done
 
   ##
-  # Samba Vonlume Config ENVs
+  # Samba Volume Config ENVs
   ##
   for I_CONF in "$(env | grep '^SAMBA_VOLUME_CONFIG_')"
   do
