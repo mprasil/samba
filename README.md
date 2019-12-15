@@ -33,6 +33,13 @@ to restrict access of volumes you can add the following to your samba volume con
     * _use for compatibility with xp if you have troubles like NTLMv1 passwords NOT PERMITTED for user_
     * !!! NOTE: NTLMv1 is known to be broken and it's easy to recover the real password from the hash !!!
 
+* __SAMBA\_GLOBAL\_CONFIG\_myconfigname__
+    * adds additional global configuration
+    * multiple variables/confgurations possible by adding unique configname to SAMBA_GLOBAL_CONFIG_
+    * examples
+        * "SAMBA_GLOBAL_CONFIG_var1= min protocol = SMB2; fruit:metadata = stream"
+        * "SAMBA_GLOBAL_CONFIG_var2= fruit:nfs_aces = no"
+
 * __SAMBA\_VOLUME\_CONFIG\_myconfigname__
     * adds a new samba volume configuration
     * multiple variables/confgurations possible by adding unique configname to SAMBA_VOLUME_CONFIG_
@@ -42,12 +49,16 @@ to restrict access of volumes you can add the following to your samba volume con
 
 # Apple TimeMachine
 
-To enable TimeMachine Support add this to your `SAMBA_VOLUME_CONFIG`: `fruit:aapl = yes; fruit:time machine = yes;`
+To enable TimeMachine Support add this to your `SAMBA_VOLUME_CONFIG`: `vfs objects = catia fruit streams_xattr; fruit:time machine = yes;`
 
 You can also limit the size available for timemachine by also adding `fruit:time machine max size = 500G;` (format: `SIZE [K|M|G|T|P]
 `)
 
-More infos about the Apple Extensions: https://www.samba.org/samba/docs/current/man-html/vfs_fruit.8.html
+**Note**: As soon as a share is defined with a `fruit`-option, the following settings are defined within the global section:
+* `fruit:aapl = yes`
+* `vfs objects = catia fruit streams_xattr`
+
+More infos about the Apple Extensions: https://www.samba.org/samba/docs/current/man-html/vfs_fruit.8.html and https://wiki.samba.org/index.php/Configure_Samba_to_Work_Better_with_Mac_OS_X
 
 # Links
 * https://wiki.samba.org/index.php/Samba_AD_DC_Port_Usage
